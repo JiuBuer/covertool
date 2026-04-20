@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>咎不二 · 工具入口</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9faff 0%, #f0f3fd 100%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column; 
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            line-height: 1.5;
+            color: #1e293b;
+        }
+
+        .home-card {
+            max-width: 720px;       
+            width: 100%;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 2.5rem;
+            box-shadow: 
+                0 25px 50px -12px rgba(0, 20, 60, 0.25),
+                inset 0 1px 2px rgba(255, 255, 255, 0.8);
+            padding: 2.8rem 2.5rem 2rem 2.5rem; 
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.2s ease;
+            margin-bottom: 2rem;    
+        }
+
+        .profile {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .avatar {
+            width: 108px;
+            height: 108px;
+            background: linear-gradient(135deg, #4f46e5, #a78bfa);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 3rem;
+            font-weight: 400;
+            box-shadow: 0 15px 30px -8px rgba(79, 70, 229, 0.35);
+            margin-bottom: 1.5rem;
+            border: 4px solid white;
+            transition: transform 0.25s;
+        }
+
+        .avatar:hover {
+            transform: scale(1.02);
+        }
+
+        .avatar span {
+            margin-top: -5px;
+        }
+
+        h1 {
+            font-size: 2.3rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.4rem;
+            background: linear-gradient(to right, #1e1b4b, #312e81);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .bio {
+            font-size: 1.1rem;
+            color: #334155;
+            max-width: 450px;
+            margin: 0.5rem auto 0;
+            border-bottom: 2px dashed #cbd5e1;
+            padding-bottom: 1.6rem;
+        }
+
+        .quick-links {
+            display: flex;
+            gap: 1.2rem;
+            justify-content: center;
+            margin: 1.2rem 0 0.5rem;
+        }
+
+        .quick-links a {
+            color: #4b5563;
+            background: #f1f4f9;
+            width: 44px;
+            height: 44px;
+            border-radius: 30px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            text-decoration: none;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.02);
+        }
+
+        .quick-links a:hover {
+            background: #e0e7ff;
+            color: #4f46e5;
+            transform: translateY(-3px);
+            border-color: #c7d2fe;
+        }
+
+        .tool-entry {
+            margin: 2.8rem 0 1.5rem;
+            background: linear-gradient(105deg, #ffffff 0%, #fcfaff 100%);
+            border-radius: 2rem;
+            padding: 2rem 2rem 2rem 2.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.8rem;
+            box-shadow: 0 20px 35px -12px rgba(79, 70, 229, 0.2), 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid rgba(255,255,255,0.9);
+            transition: all 0.3s;
+        }
+
+        .tool-entry:hover {
+            box-shadow: 0 25px 40px -12px rgba(79, 70, 229, 0.3);
+            border-color: #cbd5e1;
+        }
+
+        .tool-info h2 {
+            font-size: 1.8rem;
+            font-weight: 650;
+            background: linear-gradient(145deg, #1e293b, #2d3a5e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.01em;
+        }
+
+        .tool-info p {
+            color: #475569;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .tool-info p span {
+            background: #e9eefa;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #4f46e5;
+        }
+
+        .entry-button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.9rem 2.2rem;
+            border-radius: 40px;
+            font-size: 1.2rem;
+            font-weight: 550;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 18px -6px #4f46e5;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .entry-button:hover {
+            background: #6366f1;
+            transform: scale(1.02) translateY(-2px);
+            box-shadow: 0 18px 25px -8px #4f46e5;
+        }
+
+        .entry-button:active {
+            transform: scale(0.98);
+            background: #4338ca;
+            box-shadow: 0 8px 15px -5px #1e1b4b;
+        }
+
+        .old-footer-note {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2.2rem;
+            color: #5f6c84;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            padding-top: 1.8rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer {
+            max-width: 720px;
+            width: 100%;
+            margin-top: 0.5rem;
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 2rem;
+            padding: 1.6rem 2.2rem;
+            border: 1px solid rgba(255,255,255,0.6);
+            box-shadow: 0 12px 30px -10px rgba(0, 20, 40, 0.15);
+            color: #334155;
+        }
+
+        .footer-content {
+            width: 100%;
+        }
+
+        .footer-bottom {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.2rem 1.8rem;
+            font-size: 0.9rem;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        .footer-bottom a {
+            color: #4f46e5;
+            text-decoration: none;
+            border-bottom: 1px dotted #a5b4fc;
+            transition: color 0.2s, border-bottom 0.2s;
+            margin: 0 2px;
+        }
+
+        .footer-bottom a:hover {
+            color: #2d2ba3;
+            border-bottom: 1px solid #4f46e5;
+        }
+
+        .footer-bottom .beian-links {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 8px;
+            color: #94a3b8;
+        }
+
+        .beian-links img {
+            vertical-align: middle;
+            margin-right: 4px;
+            width: 18px;    
+            height: 20px;
+            object-fit: contain;
+            display: inline-block;
+            filter: drop-shadow(0 2px 2px rgba(0,0,0,0.05));
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .social-link {
+            color: #5f6c84;
+            background: #f1f4f9;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+            text-decoration: none;
+        }
+
+        .social-link:hover {
+            background: #e0e7ff;
+            color: #4f46e5;
+            transform: translateY(-3px);
+            border-color: #c7d2fe;
+        }
+
+        @media (max-width: 650px) {
+            .footer-bottom {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .social-links {
+                align-self: flex-end;
+                margin-top: 0.2rem;
+            }
+            .home-card {
+                padding: 2rem 1.5rem;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .tool-entry {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 1.8rem;
+            }
+            .entry-button {
+                width: 100%;
+                justify-content: center;
+                padding: 0.9rem 1rem;
+            }
+            h1 {
+                font-size: 2rem;
+            }
+            .avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 2.5rem;
+            }
+            .footer-bottom .beian-links {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            .footer-bottom p {
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="home-card">
+        <div class="profile">
+            <div class="avatar">
+                <span>😊</span>
+            </div>
+            <h1>咎不二</h1>
+            <div class="quick-links">
+                <a href="https://github.com/JiuBuer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="contact.html" aria-label="微信"> <i class="fab fa-weixin"></i></a>
+                <a href="contact.html" aria-label="邮箱"> <i class="fas fa-envelope"></i></a>
+            </div>
+            <div class="bio">
+                🌱 全栈开发者 · 效率工具爱好者 · 生活探索者<br> 保持好奇，化繁为简
+            </div>
+        </div>
+        <div class="tool-entry">
+            <div class="tool-info">
+                <h2>⚡ 微信封面生成</h2>
+                <p style="font-size: 0.9rem; color: #4b5563;">轻量 · 免费 · 即开即用</p>
+            </div>
+            <a href="covertool.html" class="entry-button">
+                进入工具 <span style="font-size: 1.4rem;">→</span>
+            </a>
+        </div>
+        <div style="height: 0.5rem;"></div> 
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-bottom">
+                <p>Copyright © 2026 咎不二 | 保留所有权利</p>
+                <div class="social-links">
+                    <a href="https://github.com/JiuBuer" target="_blank" rel="nofollow" class="social-link">
+                        <i class="fab fa-github"></i>
+                    </a>
+                    <a href="contact.html" class="social-link">
+                        <i class="fab fa-weixin"></i>
+                    </a>
+                    <a href="contact.html" class="social-link">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
