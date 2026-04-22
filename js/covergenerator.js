@@ -262,25 +262,34 @@ async function initCoverTool() {
     await gen.init('coverCanvas');
 
     const fontConfigs = {
-        '思源黑体-极细': { url: './font/SourceHanSansSC-Regular-2.otf' },
-        '思源黑体-中等': { url: './font/SourceHanSansSC-Medium-2.otf' },
-        '思源黑体-中等旧字形': { url: './font/SourceHanSansOLD-Medium-2.otf' },
-        '创客贴金刚体': { url: './font/CKTKingkong.ttf' },
-        '阿里巴巴普惠体-极细': { url: './font/AlibabaPuHuiTi-3-35-Thin.otf' },
-        '阿里巴巴普惠体-细体': { url: './font/AlibabaPuHuiTi-3-45-Light.otf' },
-        '阿里巴巴普惠体-常规': { url: './font/AlibabaPuHuiTi-3-55-Regular.otf' },
-        '阿里巴巴普惠体-常规增补': { url: './font/AlibabaPuHuiTi-3-55-RegularL3.otf' },
-        '阿里巴巴普惠体-中等': { url: './font/AlibabaPuHuiTi-3-65-Medium.otf' },
-        '阿里巴巴普惠体-半粗': { url: './font/AlibabaPuHuiTi-3-75-SemiBold.otf' },
-        '阿里巴巴普惠体-粗体': { url: './font/AlibabaPuHuiTi-3-85-Bold.otf' },
-        '阿里巴巴普惠体-特粗': { url: './font/AlibabaPuHuiTi-3-95-ExtraBold.otf' },
-        '阿里巴巴普惠体-极粗Heavy': { url: './font/AlibabaPuHuiTi-3-105-Heavy.otf' },
-        '阿里巴巴普惠体-极粗Black': { url: './font/AlibabaPuHuiTi-3-115-Black.otf' },
-        '阿里妈妈方圆体': { url: ' ./font/AlimamaFangYuanTiVF-Thin-2.ttf' },
-        '庞门正道粗书体': { url: './font/PangMenZhengDaoCuShuTi-2.ttf' },
-        '霞鹜铭心宋': { url: './font/LXGWHeartSerifCHS-2.ttf' }
+        '思源黑体-极细': { url: './font/SourceHanSansSC-Regular-2.woff2', preload: false },
+        '思源黑体-中等': { url: './font/SourceHanSansSC-Medium-2.woff2', preload: false },
+        '思源黑体-中等旧字形': { url: './font/SourceHanSansOLD-Medium-2.woff2', preload: false },
+        '创客贴金刚体': { url: './font/CKTKingkong.woff2', preload: true },
+        '阿里巴巴普惠体-极细': { url: './font/AlibabaPuHuiTi-3-35-Thin.woff2', preload: false },
+        '阿里巴巴普惠体-细体': { url: './font/AlibabaPuHuiTi-3-45-Light.woff2', preload: false },
+        '阿里巴巴普惠体-常规': { url: './font/AlibabaPuHuiTi-3-55-Regular.woff2', preload: false },
+        '阿里巴巴普惠体-常规增补': { url: './font/AlibabaPuHuiTi-3-55-RegularL3.woff2', preload: false },
+        '阿里巴巴普惠体-中等': { url: './font/AlibabaPuHuiTi-3-65-Medium.woff2', preload: false },
+        '阿里巴巴普惠体-半粗': { url: './font/AlibabaPuHuiTi-3-75-SemiBold.woff2', preload: false },
+        '阿里巴巴普惠体-粗体': { url: './font/AlibabaPuHuiTi-3-85-Bold.woff2', preload: false },
+        '阿里巴巴普惠体-特粗': { url: './font/AlibabaPuHuiTi-3-95-ExtraBold.woff2', preload: false },
+        '阿里巴巴普惠体-极粗Heavy': { url: './font/AlibabaPuHuiTi-3-105-Heavy.woff2', preload: false },
+        '阿里巴巴普惠体-极粗Black': { url: './font/AlibabaPuHuiTi-3-115-Black.woff2', preload: false },
+        '阿里妈妈方圆体': { url: ' ./font/AlimamaFangYuanTiVF-Thin-2.woff2', preload: false },
+        '庞门正道粗书体': { url: './font/PangMenZhengDaoCuShuTi-2.woff2', preload: false },
+        '霞鹜铭心宋': { url: './font/LXGWHeartSerifCHS-2.woff2', preload: false }
     };
-    await gen.loadFonts(fontConfigs);
+
+    const criticalFonts = Object.fromEntries(
+        Object.entries(fontConfigs).filter(([_, config]) => config.preload)
+    );
+    const otherFonts = Object.fromEntries(
+        Object.entries(fontConfigs).filter(([_, config]) => !config.preload)
+    );
+
+    await gen.loadFonts(criticalFonts);
+    setTimeout(() => gen.loadFonts(otherFonts), 1000);
 
     await Promise.all([
         gen.setLeftImage('./static/default-left.png'),
