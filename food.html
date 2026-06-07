@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>美食幸运大转盘 | 今天吃什么</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none; 
+        }
+
+        body {
+            background: linear-gradient(145deg, #f9faff 0%, #f0f3fd 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Poppins', 'Roboto', 'Helvetica Neue', sans-serif;
+            padding: 20px;
+        }
+
+        /* 主卡片容器 */
+        .container {
+            background: rgba(255, 248, 225, 0.95);
+            border-radius: 68px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.3), inset 0 1px 2px rgba(255, 255, 255, 0.6);
+            padding: 20px 25px 35px 25px;
+            text-align: center;
+            backdrop-filter: blur(2px);
+            transition: all 0.2s ease;
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #c0392b, #e67e22);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            margin-bottom: 5px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .sub {
+            color: #b86f2c;
+            font-weight: 500;
+            margin-bottom: 20px;
+            border-bottom: 2px dashed #f3c99b;
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        /* 转盘外层 */
+        .wheel-wrapper {
+            position: relative;
+            width: min(78vw, 78vh, 460px);
+            height: min(78vw, 78vh, 460px);
+            margin: 0 auto 25px auto;
+            cursor: pointer;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 50%;
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.3), 0 0 0 12px #f9e0a0, 0 0 0 14px #a5672e;
+            transition: box-shadow 0.2s;
+        }
+
+        /* 指针样式 (固定在转盘上方) */
+        .pointer {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 28px solid transparent;
+            border-right: 28px solid transparent;
+            border-top: 68px solid #f1c40f;
+            filter: drop-shadow(0 6px 6px rgba(0, 0, 0, 0.3));
+            z-index: 15;
+        }
+        .pointer::after {
+            content: "⭐";
+            position: absolute;
+            font-size: 32px;
+            top: -68px;
+            left: -22px;
+            color: #ffdd77;
+            text-shadow: 0 2px 3px darkorange;
+        }
+
+        /* 中心小圆点装饰 */
+        .center-point {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 22px;
+            height: 22px;
+            background: #f39c12;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            box-shadow: 0 0 0 5px rgba(255,215,130,0.8);
+            pointer-events: none;
+        }
+
+        /* 结果面板 */
+        .result-panel {
+            background: #fff3e0;
+            padding: 12px 20px;
+            border-radius: 60px;
+            margin: 5px 0 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            box-shadow: inset 0 1px 4px rgba(0,0,0,0.05), 0 8px 12px rgba(0,0,0,0.1);
+        }
+
+        .result-label {
+            font-weight: 700;
+            background: #e67e22;
+            padding: 6px 18px;
+            border-radius: 40px;
+            color: white;
+            letter-spacing: 1px;
+        }
+
+        .result-food {
+            font-size: 1.7rem;
+            font-weight: 800;
+            color: #c0392b;
+            background: #fff0cf;
+            padding: 5px 22px;
+            border-radius: 48px;
+            min-width: 140px;
+            display: inline-block;
+            box-shadow: inset 0 1px 3px #cb9e6b, 0 2px 3px rgba(0,0,0,0.05);
+        }
+
+        /* 按钮组 */
+        .btn-group {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: #f39c12;
+            border: none;
+            font-size: 1.25rem;
+            font-weight: bold;
+            padding: 12px 30px;
+            border-radius: 48px;
+            color: #2c2c2c;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 6px 0 #b45f1b;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+
+        button:active {
+            transform: translateY(3px);
+            box-shadow: 0 3px 0 #b45f1b;
+        }
+
+        .spin-btn {
+            background: #e67e22;
+            color: white;
+            box-shadow: 0 6px 0 #9b4a0e;
+        }
+
+        .reset-btn {
+            background: #2c6e2f;
+            color: white;
+            box-shadow: 0 6px 0 #1e4620;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            transform: translateY(0);
+            cursor: not-allowed;
+            filter: grayscale(0.1);
+        }
+
+        footer {
+            margin-top: 20px;
+            font-size: 0.7rem;
+            color: #b97f46;
+        }
+
+        @media (max-width: 550px) {
+            .container {
+                padding: 16px 18px 28px;
+            }
+            .result-food {
+                font-size: 1.3rem;
+                min-width: 110px;
+            }
+            button {
+                padding: 8px 18px;
+                font-size: 1rem;
+            }
+            .pointer {
+                border-left: 22px solid transparent;
+                border-right: 22px solid transparent;
+                border-top: 56px solid #f1c40f;
+                top: -24px;
+            }
+            .pointer::after {
+                font-size: 24px;
+                top: -56px;
+                left: -14px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>🍜 美食转转盘 🍕</h1>
+    <div class="sub">点击「开始选择」决定今天吃什么！</div>
+
+    <div class="wheel-wrapper">
+        <canvas id="wheelCanvas" width="600" height="600"></canvas>
+        <div class="pointer"></div>
+        <div class="center-point"></div>
+    </div>
+
+    <div class="result-panel">
+        <span class="result-label">🍽️ 天选美食</span>
+        <span class="result-food" id="foodResult">✨ 未选择 ✨</span>
+    </div>
+
+    <div class="btn-group">
+        <button class="spin-btn" id="spinBtn">🎡 开始选择</button>
+        <button class="reset-btn" id="resetBtn">🔄 重置转盘</button>
+    </div>
+    <footer>点击即转 → 指针固定，美味由天定 ✨</footer>
+</div>
+
+<script>
+    (function(){
+        const FOODS = [
+            "🍕 披萨", "🍔 汉堡", "🍣 寿司", "🥩 牛排", 
+            "🍜 拉面", "🥟 饺子", "🍲 火锅", "🍛 咖喱饭",
+            "🐟 烤鱼", "🍝 意面", "🥗 沙拉", "🌮 塔可"
+        ];
+        const SEG_COUNT = FOODS.length;         
+        const ANGLE_PER_SEG = (Math.PI * 2) / SEG_COUNT;   
+        
+        let canvas = document.getElementById('wheelCanvas');
+        let ctx = canvas.getContext('2d');
+        
+        let currentRotate = 0;      
+        let spinning = false;
+        let animFrame = null;
+        let spinStartTime = 0;
+        let spinDuration = 1800;        
+        let spinStartRotate = 0;
+        let spinTargetRotate = 0;
+        let finalSelectedIndex = -1;
+        
+        const spinBtn = document.getElementById('spinBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const foodResultSpan = document.getElementById('foodResult');
+        
+        const colorPalette = [
+            "#FF6B6B", "#4ECDC4", "#FFE66D", "#FF9F4A", 
+            "#B76E6E", "#86A788", "#F7D794", "#F8A5C2",
+            "#63B3D1", "#C38D9E", "#A8E6CF", "#FFB347"
+        ];
+        
+        function drawWheel() {
+            if (!ctx) return;
+            const w = canvas.width;
+            const h = canvas.height;
+            const centerX = w / 2;
+            const centerY = h / 2;
+            const radius = w * 0.45;   
+            ctx.clearRect(0, 0, w, h);
+            
+            for (let i = 0; i < SEG_COUNT; i++) {
+                const start = i * ANGLE_PER_SEG + currentRotate;
+                const end = start + ANGLE_PER_SEG;
+
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.arc(centerX, centerY, radius, start, end);
+                ctx.closePath();
+                ctx.fillStyle = colorPalette[i % colorPalette.length];
+                ctx.fill();
+                ctx.save();
+                ctx.shadowBlur = 0;
+                ctx.strokeStyle = "rgba(255,255,200,0.9)";
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.save();
+                ctx.translate(centerX, centerY);
+                ctx.rotate(start + ANGLE_PER_SEG / 2);
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+                const textRadius = radius * 0.68;
+                const fontSize = Math.max(12, Math.min(24, radius * 0.12));
+                ctx.font = `${fontSize}px "Segoe UI", "Poppins", system-ui`;
+                ctx.fillStyle = "#1f2f1c";
+                ctx.shadowBlur = 0;
+                ctx.shadowColor = "rgba(255,255,200,0.5)";
+                const foodLabel = FOODS[i];
+
+                ctx.fillText(foodLabel, textRadius, 6);
+                ctx.restore();
+            }
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.12, 0, 2 * Math.PI);
+            ctx.fillStyle = "#f7d44a";
+            ctx.shadowBlur = 6;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.07, 0, 2 * Math.PI);
+            ctx.fillStyle = "#e67e22";
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 0.18, 0, 2 * Math.PI);
+            ctx.strokeStyle = "#ffdd99";
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+        }
+        
+        function getCurrentSelectedFoodIndex() {
+            const pointerAngle = -Math.PI / 2; 
+            let targetAngle = pointerAngle;
+            let normPointer = (targetAngle % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+            
+            for (let i = 0; i < SEG_COUNT; i++) {
+                let start = i * ANGLE_PER_SEG + currentRotate;
+                let end = start + ANGLE_PER_SEG;
+                let normStart = (start % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                let normEnd = (end % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI);
+                let contains = false;
+                if (normStart < normEnd) {
+                    contains = (normPointer >= normStart && normPointer < normEnd);
+                } else {
+                    contains = (normPointer >= normStart || normPointer < normEnd);
+                }
+                if (contains) {
+                    return i;
+                }
+            }
+            return 0;
+        }
+        
+        function updateResultByRotate() {
+            const idx = getCurrentSelectedFoodIndex();
+            finalSelectedIndex = idx;
+            foodResultSpan.innerHTML = FOODS[idx];
+            return idx;
+        }
+        
+        function easeOutCubic(t) {
+            return 1 - Math.pow(1 - t, 3);
+        }
+        
+        function startSpin() {
+            if (spinning) return;
+            
+            const targetFoodIdx = Math.floor(Math.random() * SEG_COUNT);            
+            const pointerRaw = -Math.PI / 2;
+            let targetCenterRaw = targetFoodIdx * ANGLE_PER_SEG + ANGLE_PER_SEG / 2;
+            let desiredFinalRotate = pointerRaw - targetCenterRaw;
+            desiredFinalRotate = ((desiredFinalRotate % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+            
+            const extraRounds = 8 + Math.floor(Math.random() * 8);  // 8~15 圈
+            const extraAngle = extraRounds * 2 * Math.PI;
+            let targetRotateRaw = desiredFinalRotate;
+            let delta = targetRotateRaw - currentRotate;
+            let totalDelta = delta + extraAngle;
+            
+            spinStartRotate = currentRotate;
+            spinTargetRotate = currentRotate + totalDelta;
+            spinStartTime = performance.now();
+            spinning = true;
+            spinBtn.disabled = true;
+            resetBtn.disabled = true;
+            
+            finalSelectedIndex = targetFoodIdx;
+            
+            function animateSpin(now) {
+                const elapsed = now - spinStartTime;
+                let t = Math.min(1, elapsed / spinDuration);
+                const easeT = easeOutCubic(t);
+                const newRotate = spinStartRotate + (spinTargetRotate - spinStartRotate) * easeT;
+                currentRotate = newRotate;
+                drawWheel();
+                
+                if (t < 1) {
+                    animFrame = requestAnimationFrame(animateSpin);
+                } else {
+                    currentRotate = spinTargetRotate;
+                    currentRotate = ((currentRotate % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+                    drawWheel();
+                    const finalIdx = getCurrentSelectedFoodIndex();
+                    finalSelectedIndex = finalIdx;
+                    foodResultSpan.innerHTML = FOODS[finalIdx];
+                    spinning = false;
+                    spinBtn.disabled = false;
+                    resetBtn.disabled = false;
+                    cancelAnimationFrame(animFrame);
+                    animFrame = null;
+                }
+            }
+            
+            if (animFrame) cancelAnimationFrame(animFrame);
+            animFrame = requestAnimationFrame(animateSpin);
+        }
+        
+        function resetWheel() {
+            if (spinning) return;
+            currentRotate = 0;
+            drawWheel();
+            const idx = getCurrentSelectedFoodIndex();
+            finalSelectedIndex = idx;
+            foodResultSpan.innerHTML = FOODS[idx];
+            spinBtn.disabled = false;
+            resetBtn.disabled = false;
+        }
+        
+        function onCanvasClick(e) {
+            if (!spinning) {
+                startSpin();
+            }
+        }
+        
+        function init() {
+            const size = Math.min(window.innerWidth * 0.78, window.innerHeight * 0.78, 460);
+            canvas.width = 600;
+            canvas.height = 600;
+            canvas.style.width = `${size}px`;
+            canvas.style.height = `${size}px`;
+            drawWheel();
+            updateResultByRotate();
+            
+            spinBtn.addEventListener('click', startSpin);
+            resetBtn.addEventListener('click', resetWheel);
+            canvas.addEventListener('click', onCanvasClick);
+            
+            window.addEventListener('resize', () => {
+                const newSize = Math.min(window.innerWidth * 0.78, window.innerHeight * 0.78, 460);
+                canvas.style.width = `${newSize}px`;
+                canvas.style.height = `${newSize}px`;
+                drawWheel();
+            });
+        }
+        
+        init();
+    })();
+</script>
+</body>
+</html>
